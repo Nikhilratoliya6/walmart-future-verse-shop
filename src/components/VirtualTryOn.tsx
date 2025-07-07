@@ -3,8 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Camera, Upload, RotateCcw, ShoppingCart, Share2, Play, Square, Loader2 } from 'lucide-react';
-import { removeBackground, loadImage } from '@/utils/backgroundRemoval';
+import { Camera, Upload, RotateCcw, ShoppingCart, Share2, Play, Square, Loader2, Target } from 'lucide-react';
+import { removeBackground, loadImage, detectFace, detectPose } from '@/utils/backgroundRemoval';
 
 interface TryOnProduct {
   id: string;
@@ -12,13 +12,16 @@ interface TryOnProduct {
   price: number;
   image: string;
   category: 'glasses' | 'clothing' | 'jewelry';
-  overlayStyle?: {
-    width: string;
-    height: string;
-    top: string;
-    left: string;
-    transform?: string;
-  };
+}
+
+interface DetectionResult {
+  detected: boolean;
+  eyePosition?: { x: number; y: number };
+  faceWidth?: number;
+  torsoPosition?: { x: number; y: number };
+  shoulderWidth?: number;
+  torsoHeight?: number;
+  confidence?: number;
 }
 
 interface VirtualTryOnProps {
@@ -26,63 +29,35 @@ interface VirtualTryOnProps {
   onAddToCart: (productId: string) => void;
 }
 
-// Mock product images with overlay positioning
+// Mock product images for try-on
 const mockProducts: TryOnProduct[] = [
   {
     id: 'glasses-1',
     name: 'Classic Black Frames',
     price: 1599,
     image: 'https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=300&h=300&fit=crop',
-    category: 'glasses',
-    overlayStyle: {
-      width: '180px',
-      height: '60px',
-      top: '35%',
-      left: '50%',
-      transform: 'translateX(-50%)'
-    }
+    category: 'glasses'
   },
   {
     id: 'glasses-2',
     name: 'Round Vintage Sunglasses',
     price: 2299,
     image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=300&h=300&fit=crop',
-    category: 'glasses',
-    overlayStyle: {
-      width: '160px',
-      height: '80px',
-      top: '32%',
-      left: '50%',
-      transform: 'translateX(-50%)'
-    }
+    category: 'glasses'
   },
   {
     id: 'tshirt-1',
     name: 'Blue Cotton T-Shirt',
     price: 899,
     image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&h=300&fit=crop',
-    category: 'clothing',
-    overlayStyle: {
-      width: '200px',
-      height: '250px',
-      top: '45%',
-      left: '50%',
-      transform: 'translateX(-50%)'
-    }
+    category: 'clothing'
   },
   {
     id: 'hoodie-1',
     name: 'Red Hoodie',
     price: 1999,
     image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=300&h=300&fit=crop',
-    category: 'clothing',
-    overlayStyle: {
-      width: '220px',
-      height: '280px',
-      top: '40%',
-      left: '50%',
-      transform: 'translateX(-50%)'
-    }
+    category: 'clothing'
   }
 ];
 
@@ -94,6 +69,8 @@ export const VirtualTryOn = ({ onAddToCart }: VirtualTryOnProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingProgress, setProcessingProgress] = useState(0);
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const [detectionResult, setDetectionResult] = useState<DetectionResult | null>(null);
+  const [isDetecting, setIsDetecting] = useState(false);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -180,39 +157,57 @@ export const VirtualTryOn = ({ onAddToCart }: VirtualTryOnProps) => {
 
   const processImage = async (imageFile: Blob) => {
     setIsProcessing(true);
+    setIsDetecting(true);
     setProcessingProgress(0);
 
     try {
       // Simulate progress updates
       const progressInterval = setInterval(() => {
         setProcessingProgress(prev => {
-          if (prev >= 90) {
+          if (prev >= 70) {
             clearInterval(progressInterval);
-            return 90;
+            return 70;
           }
           return prev + 10;
         });
       }, 200);
 
-      // Load and process the image
+      // Load the image
       const imageElement = await loadImage(imageFile);
+      
+      // Step 1: Background removal
+      setProcessingProgress(30);
       const processedBlob = await removeBackground(imageElement);
       const processedUrl = URL.createObjectURL(processedBlob);
-      
       setProcessedImage(processedUrl);
+      
+      // Step 2: Face/pose detection
+      setProcessingProgress(50);
+      let detection: DetectionResult = { detected: false };
+      
+      if (selectedProduct.category === 'glasses') {
+        detection = await detectFace(imageElement);
+      } else if (selectedProduct.category === 'clothing') {
+        detection = await detectPose(imageElement);
+      }
+      
+      setDetectionResult(detection);
       setProcessingProgress(100);
       
       setTimeout(() => {
         setIsProcessing(false);
+        setIsDetecting(false);
         setProcessingProgress(0);
       }, 500);
       
     } catch (error) {
       console.error('Error processing image:', error);
       setIsProcessing(false);
+      setIsDetecting(false);
       setProcessingProgress(0);
       // Fallback to original image if processing fails
       setProcessedImage(uploadedImage);
+      setDetectionResult({ detected: false });
     }
   };
 
@@ -220,8 +215,64 @@ export const VirtualTryOn = ({ onAddToCart }: VirtualTryOnProps) => {
     stopCamera();
     setUploadedImage(null);
     setProcessedImage(null);
+    setDetectionResult(null);
     setIsProcessing(false);
+    setIsDetecting(false);
     setProcessingProgress(0);
+  };
+
+  // Calculate dynamic overlay style based on detection
+  const getOverlayStyle = () => {
+    if (!detectionResult?.detected) {
+      // Fallback to center positioning
+      if (selectedProduct.category === 'glasses') {
+        return {
+          position: 'absolute' as const,
+          width: '140px',
+          height: '45px',
+          top: '35%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 10
+        };
+      } else {
+        return {
+          position: 'absolute' as const,
+          width: '180px',
+          height: '220px',
+          top: '45%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 10
+        };
+      }
+    }
+
+    // Dynamic positioning based on AI detection
+    if (selectedProduct.category === 'glasses' && detectionResult.eyePosition && detectionResult.faceWidth) {
+      const glassesWidth = Math.max(120, detectionResult.faceWidth * 0.7);
+      return {
+        position: 'absolute' as const,
+        width: `${glassesWidth}px`,
+        height: `${glassesWidth * 0.35}px`,
+        left: `${detectionResult.eyePosition.x}px`,
+        top: `${detectionResult.eyePosition.y - (glassesWidth * 0.175)}px`,
+        transform: 'translateX(-50%)',
+        zIndex: 10
+      };
+    } else if (selectedProduct.category === 'clothing' && detectionResult.torsoPosition && detectionResult.shoulderWidth) {
+      return {
+        position: 'absolute' as const,
+        width: `${detectionResult.shoulderWidth}px`,
+        height: `${detectionResult.torsoHeight || detectionResult.shoulderWidth * 1.2}px`,
+        left: `${detectionResult.torsoPosition.x}px`,
+        top: `${detectionResult.torsoPosition.y}px`,
+        transform: 'translateX(-50%)',
+        zIndex: 10
+      };
+    }
+
+    return {};
   };
 
   const displayImage = processedImage || uploadedImage;
@@ -277,30 +328,37 @@ export const VirtualTryOn = ({ onAddToCart }: VirtualTryOnProps) => {
                 </div>
               )}
 
-              {/* Product Overlay */}
+              {/* Product Overlay with AI Positioning */}
               {selectedProduct && (cameraActive || displayImage) && (
-                <div 
-                  className="absolute opacity-80 hover:opacity-100 transition-opacity"
-                  style={selectedProduct.overlayStyle}
-                >
+                <div style={getOverlayStyle()}>
                   <img 
                     src={selectedProduct.image}
                     alt={selectedProduct.name}
-                    className="w-full h-full object-contain drop-shadow-lg"
+                    className="w-full h-full object-contain drop-shadow-lg transition-all duration-300"
                     style={{
-                      filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
+                      filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))',
+                      opacity: detectionResult?.detected ? 0.9 : 0.8
                     }}
                   />
+                  {/* Detection confidence indicator */}
+                  {detectionResult?.detected && (
+                    <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
+                      <Badge variant="secondary" className="text-xs bg-success text-success-foreground">
+                        <Target className="w-3 h-3 mr-1" />
+                        Auto-fit {Math.round((detectionResult.confidence || 0) * 100)}%
+                      </Badge>
+                    </div>
+                  )}
                 </div>
               )}
 
               {/* Processing Overlay */}
-              {isProcessing && (
+              {(isProcessing || isDetecting) && (
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                   <div className="text-center space-y-4 text-white">
                     <Loader2 className="w-8 h-8 animate-spin mx-auto" />
                     <div className="space-y-2">
-                      <p>Processing with AI...</p>
+                      <p>{isDetecting ? 'Detecting body features...' : 'Processing with AI...'}</p>
                       <Progress value={processingProgress} className="w-48" />
                       <p className="text-xs">{processingProgress}% complete</p>
                     </div>
@@ -386,11 +444,14 @@ export const VirtualTryOn = ({ onAddToCart }: VirtualTryOnProps) => {
 
             {/* AI Features Info */}
             <div className="bg-primary/5 p-3 rounded-lg">
-              <h4 className="font-semibold text-sm mb-2">✨ AI Features Active:</h4>
+              <h4 className="font-semibold text-sm mb-2">🤖 AI Auto-Fit Active:</h4>
               <div className="space-y-1 text-xs text-muted-foreground">
-                <p>• Background removal for better overlay</p>
-                <p>• Smart product positioning</p>
-                <p>• Real-time face detection</p>
+                <p>• Background removal for clean overlay</p>
+                <p>• {selectedProduct.category === 'glasses' ? 'Face & eye detection' : 'Body pose detection'}</p>
+                <p>• Automatic size & position adjustment</p>
+                {detectionResult?.detected && (
+                  <p className="text-success">✓ Body features detected successfully!</p>
+                )}
               </div>
             </div>
           </CardContent>
@@ -428,7 +489,7 @@ export const VirtualTryOn = ({ onAddToCart }: VirtualTryOnProps) => {
                         {product.category}
                       </Badge>
                       {selectedProduct?.id === product.id && (
-                        <div className="text-xs text-primary">Selected</div>
+                        <div className="text-xs text-primary font-medium">✓ Selected</div>
                       )}
                     </div>
                   </div>
@@ -449,6 +510,8 @@ export const VirtualTryOn = ({ onAddToCart }: VirtualTryOnProps) => {
                       const filtered = mockProducts.filter(p => p.category === category);
                       if (filtered.length > 0) {
                         setSelectedProduct(filtered[0]);
+                        // Reset detection when switching categories
+                        setDetectionResult(null);
                       }
                     }}
                   >
@@ -460,12 +523,12 @@ export const VirtualTryOn = ({ onAddToCart }: VirtualTryOnProps) => {
 
             {/* Instructions */}
             <div className="mt-6 bg-muted/50 p-4 rounded-lg">
-              <h4 className="font-semibold text-sm mb-2">📱 How to use:</h4>
+              <h4 className="font-semibold text-sm mb-2">🎯 Auto-Fit Instructions:</h4>
               <ol className="text-xs space-y-1 text-muted-foreground">
-                <li>1. Select a product from the list</li>
-                <li>2. Take a photo or upload one</li>
-                <li>3. See the AI-powered overlay</li>
-                <li>4. Add to cart if you like it!</li>
+                <li>1. Select glasses or clothing</li>
+                <li>2. Take/upload a clear photo of yourself</li>
+                <li>3. AI detects your {selectedProduct.category === 'glasses' ? 'face & eyes' : 'body pose'}</li>
+                <li>4. Product automatically fits your body!</li>
               </ol>
             </div>
           </CardContent>

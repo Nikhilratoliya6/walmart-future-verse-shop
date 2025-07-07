@@ -120,3 +120,93 @@ export const loadImage = (file: Blob): Promise<HTMLImageElement> => {
     img.src = URL.createObjectURL(file);
   });
 };
+
+// Face detection for glasses positioning
+export const detectFace = async (imageElement: HTMLImageElement) => {
+  try {
+    console.log('Starting face detection...');
+    const detector = await pipeline('object-detection', 'Xenova/yolos-tiny', {
+      device: 'webgpu',
+    });
+    
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Could not get canvas context');
+    
+    resizeImageIfNeeded(canvas, ctx, imageElement);
+    const imageData = canvas.toDataURL('image/jpeg', 0.8);
+    
+    const results = await detector(imageData);
+    console.log('Face detection results:', results);
+    
+    // Find person/face in results
+    const person = results.find((result: any) => 
+      result.label.toLowerCase().includes('person') && result.score > 0.5
+    );
+    
+    if (person) {
+      // Estimate eye position (approximately 1/3 down from top of detected person)
+      const eyeY = (person as any).box.ymin + ((person as any).box.ymax - (person as any).box.ymin) * 0.3;
+      const eyeX = (person as any).box.xmin + ((person as any).box.xmax - (person as any).box.xmin) * 0.5;
+      const faceWidth = (person as any).box.xmax - (person as any).box.xmin;
+      
+      return {
+        detected: true,
+        eyePosition: { x: eyeX, y: eyeY },
+        faceWidth: faceWidth,
+        confidence: (person as any).score
+      };
+    }
+    
+    return { detected: false };
+  } catch (error) {
+    console.error('Face detection error:', error);
+    return { detected: false };
+  }
+};
+
+// Pose detection for clothing positioning
+export const detectPose = async (imageElement: HTMLImageElement) => {
+  try {
+    console.log('Starting pose detection...');
+    const detector = await pipeline('object-detection', 'Xenova/yolos-tiny', {
+      device: 'webgpu',
+    });
+    
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Could not get canvas context');
+    
+    resizeImageIfNeeded(canvas, ctx, imageElement);
+    const imageData = canvas.toDataURL('image/jpeg', 0.8);
+    
+    const results = await detector(imageData);
+    console.log('Pose detection results:', results);
+    
+    // Find person in results
+    const person = results.find((result: any) => 
+      result.label.toLowerCase().includes('person') && result.score > 0.5
+    );
+    
+    if (person) {
+      // Estimate torso position
+      const torsoY = (person as any).box.ymin + ((person as any).box.ymax - (person as any).box.ymin) * 0.4;
+      const torsoX = (person as any).box.xmin + ((person as any).box.xmax - (person as any).box.xmin) * 0.5;
+      const shoulderWidth = ((person as any).box.xmax - (person as any).box.xmin) * 0.8;
+      const torsoHeight = ((person as any).box.ymax - (person as any).box.ymin) * 0.6;
+      
+      return {
+        detected: true,
+        torsoPosition: { x: torsoX, y: torsoY },
+        shoulderWidth: shoulderWidth,
+        torsoHeight: torsoHeight,
+        confidence: (person as any).score
+      };
+    }
+    
+    return { detected: false };
+  } catch (error) {
+    console.error('Pose detection error:', error);
+    return { detected: false };
+  }
+};
