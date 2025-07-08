@@ -180,158 +180,193 @@ const Index = () => {
         onVoiceSearch={() => setShowVoiceSearch(true)}
       />
 
-      {/* Hero Section */}
-      <section className="relative h-[600px] flex items-center justify-center overflow-hidden">
+      {/* Hero Section - AR/VR World */}
+      <section className="relative h-[100vh] flex items-center justify-center overflow-hidden cyber-grid">
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${heroImage})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-secondary/90" />
+        <div className="absolute inset-0 bg-gradient-vr" />
         
-        <div className="relative z-10 text-center space-y-6 px-4">
-          <Badge className="bg-accent text-accent-foreground mb-4">
-            <Sparkles className="w-4 h-4 mr-2" />
-            The Future of Shopping is Here
+        {/* Particle System */}
+        <div className="particle-system">
+          <div className="particle"></div>
+          <div className="particle"></div>
+          <div className="particle"></div>
+          <div className="particle"></div>
+          <div className="particle"></div>
+          <div className="particle"></div>
+          <div className="particle"></div>
+          <div className="particle"></div>
+          <div className="particle"></div>
+          <div className="particle"></div>
+        </div>
+        
+        <div className="relative z-10 text-center space-y-8 px-4">
+          <Badge className="bg-gradient-ar text-white mb-6 px-6 py-3 text-lg neon-border hologram">
+            <Sparkles className="w-5 h-5 mr-3" />
+            Welcome to the Future Metaverse
           </Badge>
           
-          <h1 className="text-5xl md:text-7xl font-bold text-white leading-tight">
-            Shop Smarter with
-            <span className="block text-accent">AI & AR Technology</span>
+          <h1 className="text-6xl md:text-8xl font-bold text-white leading-tight vr-float">
+            <span className="block bg-gradient-to-r from-cyan-400 via-purple-500 to-yellow-400 bg-clip-text text-transparent">
+              Walmart
+            </span>
+            <span className="block text-white ar-glow">Future Verse</span>
+            <span className="block bg-gradient-to-r from-pink-400 via-blue-500 to-green-400 bg-clip-text text-transparent">
+              Shopping Experience
+            </span>
           </h1>
           
-          <p className="text-xl text-white/90 max-w-2xl mx-auto">
-            Experience revolutionary shopping with AI assistants, virtual try-ons, 
-            voice commands, and gamified rewards that save you money.
+          <p className="text-2xl text-white/90 max-w-3xl mx-auto hologram">
+            Step into the metaverse where AI assistants, virtual reality, and augmented reality 
+            transform shopping into an immersive digital adventure.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-8">
             <Button 
               size="lg" 
-              className="bg-accent text-accent-foreground hover:bg-accent/90 text-lg px-8"
+              className="bg-gradient-ar text-white hover:scale-110 transition-ar text-xl px-10 py-6 ar-glow neon-border"
               onClick={() => setShowTryOn(true)}
             >
-              <Eye className="w-5 h-5 mr-2" />
-              Try Virtual Shopping
+              <Eye className="w-6 h-6 mr-3" />
+              Enter VR Shopping
             </Button>
             
             <Button 
               size="lg" 
               variant="outline" 
-              className="border-white text-white hover:bg-white hover:text-primary text-lg px-8"
+              className="border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black text-xl px-10 py-6 hologram hover-scale"
               onClick={() => setShowVoiceSearch(true)}
             >
-              <Mic className="w-5 h-5 mr-2" />
-              Voice Search
+              <Mic className="w-6 h-6 mr-3" />
+              Voice Command
             </Button>
           </div>
 
-          <div className="pt-8">
-            <ArrowDown className="w-6 h-6 text-white/70 mx-auto animate-bounce" />
+          {/* Floating AR elements */}
+          <div className="pt-12 space-y-6">
+            <div className="flex justify-center space-x-8">
+              <div className="w-16 h-16 bg-gradient-ar rounded-full flex items-center justify-center vr-float ar-glow">
+                <Brain className="w-8 h-8 text-white" />
+              </div>
+              <div className="w-16 h-16 bg-gradient-ar rounded-full flex items-center justify-center vr-float ar-glow" style={{ animationDelay: '1s' }}>
+                <Zap className="w-8 h-8 text-white" />
+              </div>
+              <div className="w-16 h-16 bg-gradient-ar rounded-full flex items-center justify-center vr-float ar-glow" style={{ animationDelay: '2s' }}>
+                <BarChart3 className="w-8 h-8 text-white" />
+              </div>
+            </div>
+            <ArrowDown className="w-8 h-8 text-cyan-400 mx-auto animate-bounce ar-glow" />
           </div>
         </div>
       </section>
 
-      {/* Features Overview */}
-      <section className="py-16 bg-muted/30">
+      {/* Features Overview - AR/VR Style */}
+      <section className="py-24 bg-black/50 backdrop-blur-sm matrix-rain">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Revolutionary Shopping Features</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Walmart's next-generation store combines cutting-edge technology 
-              with everyday convenience to transform your shopping experience.
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-400 bg-clip-text text-transparent">
+              Metaverse Shopping Dimensions
+            </h2>
+            <p className="text-xl text-white/80 max-w-3xl mx-auto hologram">
+              Experience shopping in multiple reality layers where technology and imagination 
+              converge to create the ultimate retail metaverse.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card className="shadow-card hover-scale transition-smooth cursor-pointer" onClick={() => setShowTryOn(true)}>
-              <CardContent className="p-6 text-center space-y-4">
-                <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center mx-auto">
-                  <Eye className="w-6 h-6 text-white" />
+          <div className="grid md:grid-cols-3 gap-12">
+            <Card className="bg-gradient-glass border-cyan-400/30 shadow-glow hover-scale transition-ar cursor-pointer hologram" onClick={() => setShowTryOn(true)}>
+              <CardContent className="p-8 text-center space-y-6">
+                <div className="w-20 h-20 bg-gradient-ar rounded-full flex items-center justify-center mx-auto vr-float ar-glow">
+                  <Eye className="w-10 h-10 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold">Virtual Try-On</h3>
-                <p className="text-muted-foreground">
-                  See how clothes, glasses, and accessories look on you before buying
+                <h3 className="text-2xl font-bold text-white">AR Try-On Portal</h3>
+                <p className="text-white/70 text-lg">
+                  Step through the augmented reality gateway to see products on your virtual self
                 </p>
-                <Badge className="bg-primary/10 text-primary">AI-Powered</Badge>
+                <Badge className="bg-cyan-400/20 text-cyan-400 text-lg px-4 py-2 neon-border">Quantum-Powered</Badge>
               </CardContent>
             </Card>
 
-            <Card className="shadow-card hover-scale transition-smooth cursor-pointer" onClick={() => setShowGamification(true)}>
-              <CardContent className="p-6 text-center space-y-4">
-                <div className="w-12 h-12 bg-gradient-accent rounded-full flex items-center justify-center mx-auto">
-                  <Star className="w-6 h-6 text-accent-foreground" />
+            <Card className="bg-gradient-glass border-purple-400/30 shadow-glow hover-scale transition-ar cursor-pointer hologram" onClick={() => setShowGamification(true)}>
+              <CardContent className="p-8 text-center space-y-6">
+                <div className="w-20 h-20 bg-gradient-vr rounded-full flex items-center justify-center mx-auto vr-float ar-glow" style={{ animationDelay: '1s' }}>
+                  <Star className="w-10 h-10 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold">Earn & Save</h3>
-                <p className="text-muted-foreground">
-                  Play games, complete challenges, and earn coins for instant discounts
+                <h3 className="text-2xl font-bold text-white">Crypto Rewards</h3>
+                <p className="text-white/70 text-lg">
+                  Mine digital coins through VR challenges and unlock exclusive metaverse deals
                 </p>
-                <Badge className="bg-accent/10 text-accent-foreground">Gamified</Badge>
+                <Badge className="bg-purple-400/20 text-purple-400 text-lg px-4 py-2 neon-border">Blockchain-Enabled</Badge>
               </CardContent>
             </Card>
 
-            <Card className="shadow-card hover-scale transition-smooth cursor-pointer" onClick={() => setShowVoiceSearch(true)}>
-              <CardContent className="p-6 text-center space-y-4">
-                <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center mx-auto">
-                  <Mic className="w-6 h-6 text-white" />
+            <Card className="bg-gradient-glass border-pink-400/30 shadow-glow hover-scale transition-ar cursor-pointer hologram" onClick={() => setShowVoiceSearch(true)}>
+              <CardContent className="p-8 text-center space-y-6">
+                <div className="w-20 h-20 bg-gradient-ar rounded-full flex items-center justify-center mx-auto vr-float ar-glow" style={{ animationDelay: '2s' }}>
+                  <Mic className="w-10 h-10 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold">Voice Shopping</h3>
-                <p className="text-muted-foreground">
-                  Search, ask questions, and shop hands-free with voice commands
+                <h3 className="text-2xl font-bold text-white">Neural Voice</h3>
+                <p className="text-white/70 text-lg">
+                  Command the metaverse with your thoughts translated into voice commands
                 </p>
-                <Badge className="bg-primary/10 text-primary">Voice-First</Badge>
+                <Badge className="bg-pink-400/20 text-pink-400 text-lg px-4 py-2 neon-border">Mind-Linked</Badge>
               </CardContent>
             </Card>
           </div>
         </div>
       </section>
 
-      {/* Core Technologies Section */}
-      <section className="py-16 bg-muted/30">
+      {/* Core Technologies Section - Neural Network Style */}
+      <section className="py-24 bg-gradient-to-b from-black/50 to-purple-900/30 cyber-grid">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Core Technologies</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Powered by advanced machine learning algorithms and predictive analytics
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
+              Neural Core Technologies
+            </h2>
+            <p className="text-xl text-white/80 max-w-3xl mx-auto hologram">
+              Quantum algorithms and neural networks power the metaverse shopping intelligence
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
-            <Card className="shadow-card hover-scale transition-smooth">
-              <CardContent className="p-6 text-center space-y-4">
-                <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center mx-auto">
-                  <Brain className="w-6 h-6 text-white" />
+          <div className="grid lg:grid-cols-3 gap-12">
+            <Card className="bg-gradient-glass border-green-400/30 shadow-glow hover-scale transition-ar hologram">
+              <CardContent className="p-8 text-center space-y-6">
+                <div className="w-20 h-20 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center mx-auto vr-float ar-glow">
+                  <Brain className="w-10 h-10 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold">AI Recommendations</h3>
-                <p className="text-muted-foreground">
-                  Personalized product suggestions using machine learning
+                <h3 className="text-2xl font-bold text-white">Quantum AI Brain</h3>
+                <p className="text-white/70 text-lg">
+                  Neuromorphic computing predicts your desires before you know them
                 </p>
-                <Badge className="bg-primary/10 text-primary">ML-Powered</Badge>
+                <Badge className="bg-green-400/20 text-green-400 text-lg px-4 py-2 neon-border">Quantum-Enhanced</Badge>
               </CardContent>
             </Card>
 
-            <Card className="shadow-card hover-scale transition-smooth">
-              <CardContent className="p-6 text-center space-y-4">
-                <div className="w-12 h-12 bg-gradient-accent rounded-full flex items-center justify-center mx-auto">
-                  <Zap className="w-6 h-6 text-accent-foreground" />
+            <Card className="bg-gradient-glass border-yellow-400/30 shadow-glow hover-scale transition-ar hologram">
+              <CardContent className="p-8 text-center space-y-6">
+                <div className="w-20 h-20 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto vr-float ar-glow" style={{ animationDelay: '1s' }}>
+                  <Zap className="w-10 h-10 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold">Dynamic Pricing</h3>
-                <p className="text-muted-foreground">
-                  Real-time price optimization based on demand and inventory
+                <h3 className="text-2xl font-bold text-white">Reality Pricing</h3>
+                <p className="text-white/70 text-lg">
+                  Prices shift across dimensions based on multiverse market forces
                 </p>
-                <Badge className="bg-accent/10 text-accent-foreground">Real-Time</Badge>
+                <Badge className="bg-yellow-400/20 text-yellow-400 text-lg px-4 py-2 neon-border">Dimension-Synced</Badge>
               </CardContent>
             </Card>
 
-            <Card className="shadow-card hover-scale transition-smooth">
-              <CardContent className="p-6 text-center space-y-4">
-                <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center mx-auto">
-                  <BarChart3 className="w-6 h-6 text-white" />
+            <Card className="bg-gradient-glass border-blue-400/30 shadow-glow hover-scale transition-ar hologram">
+              <CardContent className="p-8 text-center space-y-6">
+                <div className="w-20 h-20 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center mx-auto vr-float ar-glow" style={{ animationDelay: '2s' }}>
+                  <BarChart3 className="w-10 h-10 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold">Predictive Analytics</h3>
-                <p className="text-muted-foreground">
-                  Forecasting demand and optimizing inventory management
+                <h3 className="text-2xl font-bold text-white">Time Analytics</h3>
+                <p className="text-white/70 text-lg">
+                  Predict future trends by analyzing data from parallel timelines
                 </p>
-                <Badge className="bg-primary/10 text-primary">Analytics</Badge>
+                <Badge className="bg-blue-400/20 text-blue-400 text-lg px-4 py-2 neon-border">Temporal-Powered</Badge>
               </CardContent>
             </Card>
           </div>
