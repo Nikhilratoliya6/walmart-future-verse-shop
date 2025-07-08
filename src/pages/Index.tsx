@@ -11,6 +11,9 @@ import { VoiceSearch } from '@/components/VoiceSearch';
 import { PersonalizedRecommendations } from '@/components/PersonalizedRecommendations';
 import { DynamicPricing } from '@/components/DynamicPricing';
 import { PredictiveAnalytics } from '@/components/PredictiveAnalytics';
+import { ConversationalCommerce } from '@/components/ConversationalCommerce';
+import { AdvancedAnalytics } from '@/components/AdvancedAnalytics';
+import { InteractiveShoppingJourney } from '@/components/InteractiveShoppingJourney';
 import { ArrowDown, Sparkles, Eye, Mic, Star, Brain, Zap, BarChart3 } from 'lucide-react';
 import heroImage from '@/assets/hero-walmart-future.jpg';
 
@@ -104,6 +107,17 @@ const Index = () => {
   const handleVoiceSearchResult = (query: string) => {
     console.log('Voice search query:', query);
     // Here you would typically filter products or navigate to search results
+  };
+
+  const handlePurchaseComplete = (productId: string, amount: number) => {
+    setCartItems(prev => prev + 1);
+    setWalletCoins(prev => prev - amount);
+  };
+
+  const handleJourneyStepComplete = (stepId: string, reward?: any) => {
+    if (reward?.type === 'coins') {
+      setWalletCoins(prev => prev + reward.value);
+    }
   };
 
   if (showTryOn) {
@@ -344,6 +358,20 @@ const Index = () => {
             />
           </div>
           
+          <div className="grid lg:grid-cols-2 gap-8">
+            <AdvancedAnalytics />
+            
+            <InteractiveShoppingJourney
+              userProfile={{
+                interests: ['fitness', 'technology'],
+                purchaseHistory: ['headphones', 'shoes'],
+                currentGoal: 'Complete home gym setup'
+              }}
+              onStepComplete={handleJourneyStepComplete}
+              onProductSelect={(productId) => console.log('Selected:', productId)}
+            />
+          </div>
+          
           <PredictiveAnalytics />
         </div>
       </section>
@@ -383,6 +411,12 @@ const Index = () => {
 
       {/* AI Assistant */}
       <AIAssistant expertCredits={expertCredits} />
+      
+      {/* Conversational Commerce */}
+      <ConversationalCommerce 
+        onPurchaseComplete={handlePurchaseComplete}
+        walletCoins={walletCoins}
+      />
 
       {/* Voice Search Modal */}
       <VoiceSearch
