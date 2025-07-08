@@ -8,7 +8,10 @@ import { GamificationHub } from '@/components/GamificationHub';
 import { ProductCard } from '@/components/ProductCard';
 import { VirtualTryOn } from '@/components/VirtualTryOn';
 import { VoiceSearch } from '@/components/VoiceSearch';
-import { ArrowDown, Sparkles, Eye, Mic, Star } from 'lucide-react';
+import { PersonalizedRecommendations } from '@/components/PersonalizedRecommendations';
+import { DynamicPricing } from '@/components/DynamicPricing';
+import { PredictiveAnalytics } from '@/components/PredictiveAnalytics';
+import { ArrowDown, Sparkles, Eye, Mic, Star, Brain, Zap, BarChart3 } from 'lucide-react';
 import heroImage from '@/assets/hero-walmart-future.jpg';
 
 const Index = () => {
@@ -268,8 +271,85 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Products Section */}
+      {/* Core Technologies Section */}
+      <section className="py-16 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Core Technologies</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Powered by advanced machine learning algorithms and predictive analytics
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-8">
+            <Card className="shadow-card hover-scale transition-smooth">
+              <CardContent className="p-6 text-center space-y-4">
+                <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center mx-auto">
+                  <Brain className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold">AI Recommendations</h3>
+                <p className="text-muted-foreground">
+                  Personalized product suggestions using machine learning
+                </p>
+                <Badge className="bg-primary/10 text-primary">ML-Powered</Badge>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-card hover-scale transition-smooth">
+              <CardContent className="p-6 text-center space-y-4">
+                <div className="w-12 h-12 bg-gradient-accent rounded-full flex items-center justify-center mx-auto">
+                  <Zap className="w-6 h-6 text-accent-foreground" />
+                </div>
+                <h3 className="text-xl font-semibold">Dynamic Pricing</h3>
+                <p className="text-muted-foreground">
+                  Real-time price optimization based on demand and inventory
+                </p>
+                <Badge className="bg-accent/10 text-accent-foreground">Real-Time</Badge>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-card hover-scale transition-smooth">
+              <CardContent className="p-6 text-center space-y-4">
+                <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center mx-auto">
+                  <BarChart3 className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold">Predictive Analytics</h3>
+                <p className="text-muted-foreground">
+                  Forecasting demand and optimizing inventory management
+                </p>
+                <Badge className="bg-primary/10 text-primary">Analytics</Badge>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Technology Features */}
       <section className="py-16">
+        <div className="container mx-auto px-4 space-y-8">
+          <div className="grid lg:grid-cols-2 gap-8">
+            <PersonalizedRecommendations 
+              userPreferences={{
+                categories: ['Electronics', 'Clothing'],
+                priceRange: [500, 5000],
+                style: 'casual'
+              }}
+              onProductSelect={(productId) => console.log('Selected:', productId)}
+            />
+            
+            <DynamicPricing 
+              userCoins={walletCoins}
+              products={products}
+              onPriceUpdate={(productId, newPrice) => console.log('Price updated:', productId, newPrice)}
+            />
+          </div>
+          
+          <PredictiveAnalytics />
+        </div>
+      </section>
+
+      {/* Products Section */}
+      <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <div>
