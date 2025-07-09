@@ -1,13 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Text, Box, Sphere, Plane, useTexture, Html } from '@react-three/drei';
+import { OrbitControls, Text, Box, Sphere, Plane, Html } from '@react-three/drei';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { ArrowLeft, User, Gamepad2, ShoppingCart, Eye, Star, Gift } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import * as THREE from 'three';
 
 // Avatar selection options
 const avatarOptions = [
@@ -51,7 +50,7 @@ const sectionProducts = {
 
 // Interactive Avatar Component
 function Avatar3D({ position, selectedAvatar }: { position: [number, number, number], selectedAvatar: any }) {
-  const meshRef = useRef<THREE.Mesh>(null);
+  const meshRef = useRef<any>(null);
   
   useFrame((state) => {
     if (meshRef.current) {
@@ -80,6 +79,8 @@ function Avatar3D({ position, selectedAvatar }: { position: [number, number, num
 function ProductDisplay({ product, section }: { product: any, section: string }) {
   const [hovered, setHovered] = useState(false);
   
+  const sectionColor = storeSections.find(s => s.id === section)?.color || '#666666';
+  
   return (
     <group position={product.position}>
       <Box 
@@ -88,8 +89,7 @@ function ProductDisplay({ product, section }: { product: any, section: string })
         onPointerOut={() => setHovered(false)}
       >
         <meshStandardMaterial 
-          color={hovered ? '#FFD700' : sectionProducts[section as keyof typeof sectionProducts] ? 
-            storeSections.find(s => s.id === section)?.color : '#666666'} 
+          color={hovered ? '#FFD700' : sectionColor} 
         />
       </Box>
       <Html position={[0, 1.5, 0]} center>
@@ -171,7 +171,7 @@ function WalmartPosters() {
 // Gamification Zone Component
 function GamificationZone() {
   const [spinning, setSpinning] = useState(false);
-  const meshRef = useRef<THREE.Mesh>(null);
+  const meshRef = useRef<any>(null);
   
   useFrame(() => {
     if (meshRef.current && spinning) {
@@ -275,6 +275,11 @@ function Scene({ selectedAvatar }: { selectedAvatar: any }) {
       </Plane>
       <Plane args={[50, 10]} position={[25, 5, 0]} rotation={[0, Math.PI / 2, 0]}>
         <meshStandardMaterial color="#9CA3AF" />
+      </Plane>
+      
+      {/* Ceiling */}
+      <Plane args={[50, 50]} position={[0, 10, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <meshStandardMaterial color="#F3F4F6" />
       </Plane>
     </>
   );
@@ -406,7 +411,11 @@ const WalVerse = () => {
       </div>
 
       {/* 3D Scene */}
-      <Canvas camera={{ position: [0, 8, 12], fov: 60 }}>
+      <Canvas 
+        camera={{ position: [0, 8, 12], fov: 60 }}
+        gl={{ antialias: true }}
+        dpr={[1, 2]}
+      >
         <Scene selectedAvatar={selectedAvatar} />
         <OrbitControls 
           enablePan={true}
