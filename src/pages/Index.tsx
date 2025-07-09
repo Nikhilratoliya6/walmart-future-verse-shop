@@ -14,10 +14,12 @@ import { PredictiveAnalytics } from '@/components/PredictiveAnalytics';
 import { ConversationalCommerce } from '@/components/ConversationalCommerce';
 import { AdvancedAnalytics } from '@/components/AdvancedAnalytics';
 import { InteractiveShoppingJourney } from '@/components/InteractiveShoppingJourney';
-import { ArrowDown, Sparkles, Eye, Mic, Star, Brain, Zap, BarChart3 } from 'lucide-react';
+import { ArrowDown, Sparkles, Eye, Mic, Star, Brain, Zap, BarChart3, Zap as VirtualWorld } from 'lucide-react';
 import heroImage from '@/assets/hero-walmart-future.jpg';
+import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
+  const navigate = useNavigate();
   const [walletCoins, setWalletCoins] = useState(150);
   const [expertCredits, setExpertCredits] = useState(3);
   const [cartItems, setCartItems] = useState(0);
@@ -207,11 +209,20 @@ const Index = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
             <Button 
               size="lg" 
+              className="bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 text-lg px-8 shadow-lg"
+              onClick={() => navigate('/walverse')}
+            >
+              <VirtualWorld className="w-5 h-5 mr-2" />
+              Try WalVerse
+            </Button>
+            
+            <Button 
+              size="lg" 
               className="bg-accent text-accent-foreground hover:bg-accent/90 text-lg px-8"
               onClick={() => setShowTryOn(true)}
             >
               <Eye className="w-5 h-5 mr-2" />
-              Try Virtual Shopping
+              Virtual Try-On
             </Button>
             
             <Button 
@@ -242,7 +253,20 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-4 gap-8">
+            <Card className="shadow-card hover-scale transition-smooth cursor-pointer border-2 border-purple-500/50 bg-gradient-to-br from-purple-50 to-blue-50" onClick={() => navigate('/walverse')}>
+              <CardContent className="p-6 text-center space-y-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center mx-auto">
+                  <VirtualWorld className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold">WalVerse</h3>
+                <p className="text-muted-foreground">
+                  Explore our 3D virtual mall with your avatar and interactive shopping
+                </p>
+                <Badge className="bg-gradient-to-r from-purple-100 to-blue-100 text-purple-700">3D Virtual Mall</Badge>
+              </CardContent>
+            </Card>
+
             <Card className="shadow-card hover-scale transition-smooth cursor-pointer" onClick={() => setShowTryOn(true)}>
               <CardContent className="p-6 text-center space-y-4">
                 <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center mx-auto">
